@@ -40,7 +40,6 @@ public class Cliente {
 
     private String direccion;
 
-    // Relaciones:
     @OneToMany(mappedBy = "cliente")
     private Set<Venta> ventas = new HashSet<>();
 

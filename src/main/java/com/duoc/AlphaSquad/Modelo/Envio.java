@@ -22,9 +22,6 @@ public class Envio {
     private String ciudad;
 
     @Column(nullable = false)
-    private String region;
-
-    @Column(nullable = false)
     private Integer costoEnvio;
 
     @Column(nullable = false)
