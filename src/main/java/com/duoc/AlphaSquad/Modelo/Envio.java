@@ -39,4 +39,10 @@ public class Envio {
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "empleado_id")
+    private Empleado empleado;
+
+
 }

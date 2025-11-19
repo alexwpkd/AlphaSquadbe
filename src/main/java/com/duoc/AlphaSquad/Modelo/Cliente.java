@@ -35,10 +35,6 @@ public class Cliente {
     private String password;
 
     @ManyToOne
-    @JoinColumn(name = "region_id")
-    private Region region;
-
-    @ManyToOne
     @JoinColumn(name = "comuna_id")
     private Comuna comuna;
 

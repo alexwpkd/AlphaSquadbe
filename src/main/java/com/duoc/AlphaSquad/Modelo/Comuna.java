@@ -18,6 +18,6 @@ public class Comuna {
     private String nombre;
 
     @ManyToOne
-    @JoinColumn(name = "region_id", nullable = false)
+    @JoinColumn(name = "region_id")
     private Region region;
 }
