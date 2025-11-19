@@ -3,6 +3,9 @@ package com.duoc.AlphaSquad.Modelo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "administrador")
 @Data
@@ -26,6 +29,10 @@ public class Administrador {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String telefono;
+    @OneToMany(mappedBy = "administrador", cascade = CascadeType.ALL)
+    private Set<Empleado> empleados = new HashSet<>();;
+
+    @OneToMany(mappedBy = "administrador", cascade = CascadeType.ALL)
+    private Set<Compra> compras = new HashSet<>();
 
 }

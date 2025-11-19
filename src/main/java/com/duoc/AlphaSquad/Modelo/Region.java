@@ -6,8 +6,8 @@ import lombok.*;
 @Entity
 @Table(name = "region")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Region {
 
     @Id

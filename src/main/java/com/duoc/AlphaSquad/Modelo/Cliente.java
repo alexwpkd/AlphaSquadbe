@@ -1,7 +1,12 @@
 package com.duoc.AlphaSquad.Modelo;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "cliente")
@@ -12,24 +17,37 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idCliente;
+    private Long id;
 
     @Column(nullable = false)
     private String nombre;
 
     @Column(nullable = false)
-    private String apellido;
+    private String apellidos;
 
     @Column(nullable = false, unique = true)
     private String rut;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String correo;
 
-    private Integer edad; //Igual es necesario por el tema de la arma pero estoy seguro que se puede validar con el rut
+    @Column(nullable = false)
+    private String password;
 
     @ManyToOne
-    @JoinColumn(name = "direccion_id", nullable = false)
-    private Direccion direccion;
+    @JoinColumn(name = "region_id")
+    private Region region;
 
+    @ManyToOne
+    @JoinColumn(name = "comuna_id")
+    private Comuna comuna;
+
+    private String direccion;
+
+    // Relaciones:
+    @OneToMany(mappedBy = "cliente")
+    private Set<Venta> ventas = new HashSet<>();
+
+    @OneToMany(mappedBy = "cliente")
+    private Set<Envio> envios = new HashSet<>();
 }

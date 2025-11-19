@@ -2,29 +2,41 @@ package com.duoc.AlphaSquad.Modelo;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "envio")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Envio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEnvio;
 
+    @Column(nullable = false)
     private String direccionEntrega;
 
+    @Column(nullable = false)
     private String ciudad;
 
+    @Column(nullable = false)
     private String region;
 
+    @Column(nullable = false)
     private Integer costoEnvio;
 
-    private String estado;
+    @Column(nullable = false)
+    private String estado; // pendiente, en_transito, entregado
+
+    private LocalDate fechaEntregaEstimada;
 
     @OneToOne
-    @JoinColumn(name = "venta_id", unique = true)
+    @JoinColumn(name = "venta_id", nullable = false, unique = true)
     private Venta venta;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 }

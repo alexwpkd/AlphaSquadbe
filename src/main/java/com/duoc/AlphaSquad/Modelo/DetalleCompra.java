@@ -3,6 +3,7 @@ package com.duoc.AlphaSquad.Modelo;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 @Entity
 @Table(name = "detalle_compra")
 @Data
@@ -12,9 +13,18 @@ public class DetalleCompra {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idCompraItem;
+    private Long idCompradetalle;
 
+    @Column(nullable = false)
     private Integer cantidad;
+
+    @Column(nullable = false)
+    private Integer precioUnitario;
+
+    @Column(nullable = false)
+    private Integer subtotal;
+
+    private final double iva = 0.19;
 
     @ManyToOne
     @JoinColumn(name = "compra_id", nullable = false)

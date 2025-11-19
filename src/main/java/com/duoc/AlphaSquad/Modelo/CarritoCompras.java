@@ -5,22 +5,23 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "carrito_de_compras")
+@Table(name = "carrito_compra")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class CarritoDeCompras {
+@AllArgsConstructor
+public class CarritoCompras {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCarrito;
 
-    private LocalDateTime fechaCreacion; //Tengo duda si dejamos la fecha de creacion
-
-    @Column(nullable = false)
-    private String estado; // para pasar de pendiente,realizado, cancelado
-
     @OneToOne
     @JoinColumn(name = "cliente_id", nullable = false, unique = true)
     private Cliente cliente;
+
+    @Column(nullable = false)
+    private LocalDateTime fechaCreacion;
+
+    @Column(nullable = false)
+    private String estado; // activo / convertido_en_venta
 }

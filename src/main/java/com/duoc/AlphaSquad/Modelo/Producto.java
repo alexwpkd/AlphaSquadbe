@@ -3,13 +3,15 @@ package com.duoc.AlphaSquad.Modelo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "producto")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Producto {
+@AllArgsConstructor
+public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,12 +20,35 @@ public abstract class Producto {
     @Column(nullable = false)
     private String nombre;
 
-    private String descripcion;
+    @Column(nullable = false)
+    private String sku;
 
     @Column(nullable = false)
     private Integer precio;
 
-    private String marca;
+    @Column(nullable = false)
+    private Boolean enStock;
 
+    @Column(nullable = false)
+    private Integer stock;
+
+    //private String imagenClave;
+
+    @Column(nullable = false)
+    private String descripcion;
+
+    @Column(nullable = false)
     private String categoria;
+
+    @Column(nullable = false)
+    private String subcategoria;
+
+    @OneToOne(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private DetalleProducto detalleProducto;
+
+    @OneToMany(mappedBy = "producto")
+    private Set<DetalleVenta> ventas = new HashSet<>();;
+
+    @OneToMany(mappedBy = "producto")
+    private Set<DetalleCompra> compras = new HashSet<>();;
 }

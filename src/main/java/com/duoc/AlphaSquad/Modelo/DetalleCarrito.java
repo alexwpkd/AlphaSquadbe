@@ -12,14 +12,14 @@ public class DetalleCarrito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idCarritoItem;
+    private Long idCarritoDetalle;
 
     @Column(nullable = false)
     private Integer cantidad;
 
     @ManyToOne
     @JoinColumn(name = "carrito_id", nullable = false)
-    private CarritoDeCompras carrito;
+    private CarritoCompras carrito;
 
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)

@@ -6,18 +6,24 @@ import lombok.*;
 @Entity
 @Table(name = "detalle_venta")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class DetalleVenta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idDetalle;
+    private Long idDetalleVenta;
 
     @Column(nullable = false)
     private Integer cantidad;
 
-    private Integer total;
+    @Column(nullable = false)
+    private Integer precioUnitario;
+
+    @Column(nullable = false)
+    private Integer subtotal;
+
+    private final double iva = 0.19;
 
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)

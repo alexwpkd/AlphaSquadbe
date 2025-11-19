@@ -2,28 +2,41 @@ package com.duoc.AlphaSquad.Modelo;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "venta")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Venta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idVenta;
 
-    private LocalDateTime fechaVenta; //Igual es necesario
-
-    private Integer total;
+    @Column(nullable = false)
+    private LocalDateTime fechaVenta;
 
     @Column(nullable = false)
-    private String estado; // lo mismo pagada, pendiente, anulada
+    private Integer total;
+
+    private Integer descuento;
+
+    @Column(nullable = false)
+    private String estado; // pagada, pendiente, anulada
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "administrador_id")
+    private Administrador administrador;
+
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
+    private Set<DetalleVenta> detalles = new HashSet<>();;
+
 }

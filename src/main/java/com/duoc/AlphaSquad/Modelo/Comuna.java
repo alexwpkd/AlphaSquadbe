@@ -6,8 +6,8 @@ import lombok.*;
 @Entity
 @Table(name = "comuna")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Comuna {
 
     @Id
