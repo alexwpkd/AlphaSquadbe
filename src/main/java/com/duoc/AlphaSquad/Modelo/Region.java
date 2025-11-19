@@ -3,6 +3,9 @@ package com.duoc.AlphaSquad.Modelo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "region")
 @Data
@@ -16,4 +19,7 @@ public class Region {
 
     @Column(nullable = false, unique = true)
     private String nombre;
+
+    @OneToMany(mappedBy = "region")
+    private Set<Comuna> comunas = new HashSet<>();
 }

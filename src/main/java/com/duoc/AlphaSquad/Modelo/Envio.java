@@ -44,5 +44,7 @@ public class Envio {
     @JoinColumn(name = "empleado_id")
     private Empleado empleado;
 
-
+    @ManyToOne()
+    @JoinColumn(name = "comuna_id")
+    private Comuna comuna;
 }
