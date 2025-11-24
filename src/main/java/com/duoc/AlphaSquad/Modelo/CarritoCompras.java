@@ -27,7 +27,4 @@ public class CarritoCompras {
     @Column(nullable = false)
     private String estado; // activo / convertido_en_venta
 
-    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL)
-    private Set<DetalleCarrito> detalleCar = new HashSet<>();
-
 }

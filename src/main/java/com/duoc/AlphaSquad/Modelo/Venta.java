@@ -36,14 +36,8 @@ public class Venta {
     @JoinColumn(name = "administrador_id")
     private Administrador administrador;
 
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<DetalleVenta> detalleV = new HashSet<>();
-
     @ManyToOne
     @JoinColumn(name = "empleado_id")
     private Empleado empleado;
-
-    @OneToOne(mappedBy = "venta")
-    private Envio envio;
 
 }

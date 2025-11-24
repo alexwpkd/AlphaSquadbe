@@ -23,7 +23,4 @@ public class Comuna {
     @ManyToOne
     @JoinColumn(name = "region_id")
     private Region region;
-
-    @OneToMany(mappedBy = "comuna")
-    private Set<Cliente> clientes = new HashSet<>();
 }

@@ -43,9 +43,6 @@ public class Producto {
     @Column(nullable = false)
     private String subcategoria;
 
-    @OneToOne(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
-    private DetalleProducto detalleProducto;
-
     @OneToMany(mappedBy = "producto")
     private Set<DetalleVenta> ventas = new HashSet<>();;
 

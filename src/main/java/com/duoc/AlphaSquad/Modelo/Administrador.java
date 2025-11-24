@@ -28,11 +28,4 @@ public class Administrador {
 
     @Column(nullable = false, unique = true)
     private String email;
-
-    @OneToMany(mappedBy = "administrador", cascade = CascadeType.ALL)
-    private Set<Empleado> empleados = new HashSet<>();;
-
-    @OneToMany(mappedBy = "administrador", cascade = CascadeType.ALL)
-    private Set<Compra> compras = new HashSet<>();
-
 }

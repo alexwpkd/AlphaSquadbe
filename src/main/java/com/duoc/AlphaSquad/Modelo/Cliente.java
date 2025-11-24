@@ -39,10 +39,4 @@ public class Cliente {
     private Comuna comuna;
 
     private String direccion;
-
-    @OneToMany(mappedBy = "cliente")
-    private Set<Venta> ventas = new HashSet<>();
-
-    @OneToMany(mappedBy = "cliente")
-    private Set<Envio> envios = new HashSet<>();
 }

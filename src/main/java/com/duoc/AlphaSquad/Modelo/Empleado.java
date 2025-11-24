@@ -42,10 +42,4 @@ public class Empleado {
     @JoinColumn(name = "administrador_id")
     private Administrador administrador;
 
-    @OneToMany(mappedBy = "empleado")
-    private Set<Venta> ventas = new HashSet<>();;
-
-    @OneToMany(mappedBy = "empleado")
-    private Set<Envio> envios = new HashSet<>();;
-
 }

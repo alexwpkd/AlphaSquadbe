@@ -19,7 +19,4 @@ public class Region {
 
     @Column(nullable = false, unique = true)
     private String nombre;
-
-    @OneToMany(mappedBy = "region")
-    private Set<Comuna> comunas = new HashSet<>();
 }

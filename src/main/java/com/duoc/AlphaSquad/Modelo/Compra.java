@@ -31,6 +31,4 @@ public class Compra {
     @JoinColumn(name = "administrador_id")
     private Administrador administrador;
 
-    @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL)
-    private Set<DetalleCompra> detalleC = new HashSet<>();
 }
