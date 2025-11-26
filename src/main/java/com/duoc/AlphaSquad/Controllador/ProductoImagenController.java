@@ -1,17 +1,15 @@
-package com.duoc.AlphaSquad.Controllador;
+package com.duoc.AlphaSquad.Controlador;
 
-import com.duoc.AlphaSquad.Modelo.Producto;
-import com.duoc.AlphaSquad.Servicio.FileStorageService;
 import com.duoc.AlphaSquad.Servicio.ProductoImagenService;
 import com.duoc.AlphaSquad.dto.ProductoCreateDTO;
+import com.duoc.AlphaSquad.Modelo.Producto;
 import jakarta.validation.Valid;
-import org.springframework.core.io.Resource;
+
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.List;
 
 @RestController
@@ -20,11 +18,9 @@ import java.util.List;
 public class ProductoImagenController {
 
     private final ProductoImagenService service;
-    private final FileStorageService storage;
 
-    public ProductoImagenController(ProductoImagenService service, FileStorageService storage) {
+    public ProductoImagenController(ProductoImagenService service) {
         this.service = service;
-        this.storage = storage;
     }
 
     @GetMapping
@@ -43,8 +39,7 @@ public class ProductoImagenController {
             @RequestPart(value = "imagen", required = false) MultipartFile imagen
     ) {
         Producto creado = service.crearConDTO(dto, imagen);
-        return ResponseEntity
-                .created(URI.create("/api/productos/" + creado.getIdProducto()))
+        return ResponseEntity.created(URI.create("/api/productos/" + creado.getIdProducto()))
                 .body(creado);
     }
 
@@ -54,27 +49,12 @@ public class ProductoImagenController {
             @Valid @ModelAttribute ProductoCreateDTO dto,
             @RequestPart(value = "imagen", required = false) MultipartFile imagen
     ) {
-        Producto actualizado = service.actualizarConDTO(id, dto, imagen);
-        return ResponseEntity.ok(actualizado);
+        return ResponseEntity.ok(service.actualizarConDTO(id, dto, imagen));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/uploads/{filename:.+}")
-    public ResponseEntity<Resource> serveImage(@PathVariable String filename) {
-        Resource file = storage.loadFileAsResource(filename);
-
-        String type = "application/octet-stream";
-        try {
-            type = Files.probeContentType(file.getFile().toPath());
-        } catch (Exception ignored) {}
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(type))
-                .body(file);
     }
 }
