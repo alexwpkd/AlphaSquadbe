@@ -8,7 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface RepEnvio extends JpaRepository<Envio, Long> {
-    // Antes: Optional<Envio> findByVentaId(Long ventaId);
     Optional<Envio> findByVenta_IdVenta(Long idVenta);
 }
 

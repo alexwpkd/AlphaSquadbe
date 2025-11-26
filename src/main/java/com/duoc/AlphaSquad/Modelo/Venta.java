@@ -23,8 +23,6 @@ public class Venta {
     @Column(nullable = false)
     private Integer total;
 
-    private Integer descuento;
-
     @Column(nullable = false)
     private String estado; // pagada, pendiente, anulada
 

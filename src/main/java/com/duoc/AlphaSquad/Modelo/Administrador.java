@@ -27,5 +27,9 @@ public class Administrador {
     private String rut;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String correo;
+
+    @Column(nullable = false)
+    private String password;
+
 }

@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface RepDetalleCarrito extends JpaRepository<DetalleCarrito, Long> {
-    // Antes: List<DetalleCarrito> findByCarritoId(Long carritoId);
     List<DetalleCarrito> findByCarrito_IdCarrito(Long idCarrito);
 }
