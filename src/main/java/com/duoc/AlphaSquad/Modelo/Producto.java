@@ -32,7 +32,7 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock;
 
-    private String imagenClave;
+    private String imagen;
 
     @Column(nullable = false)
     private String descripcion;
