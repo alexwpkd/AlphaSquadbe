@@ -38,5 +38,6 @@ public class Cliente {
     @JoinColumn(name = "comuna_id")
     private Comuna comuna;
 
+    @Column(nullable = false)
     private String direccion;
 }
