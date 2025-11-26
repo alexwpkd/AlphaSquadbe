@@ -1,4 +1,4 @@
-package com.duoc.AlphaSquad.Controlador;
+package com.duoc.AlphaSquad.Controllador;
 
 import com.duoc.AlphaSquad.Servicio.ProductoImagenService;
 import com.duoc.AlphaSquad.dto.ProductoCreateDTO;
