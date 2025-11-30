@@ -2,6 +2,7 @@ package com.duoc.AlphaSquad.Controllador;
 
 import com.duoc.AlphaSquad.Modelo.Cliente;
 import com.duoc.AlphaSquad.Servicio.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
-@CrossOrigin(origins = "*")
+// @CrossOrigin("*")
 public class ClienteController {
 
     private final ClienteService service;
@@ -30,15 +31,18 @@ public class ClienteController {
     }
 
     @PostMapping
-    public Cliente crear(@RequestBody Cliente cliente) {
-        return service.crear(cliente);
+    public ResponseEntity<Cliente> crear(@Valid @RequestBody Cliente cliente) {
+        Cliente creado = service.crear(cliente);
+        return ResponseEntity.ok(creado);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Cliente> actualizar(@PathVariable Long id,
-                                              @RequestBody Cliente cliente) {
+                                              @Valid @RequestBody Cliente cliente) {
         Cliente actualizado = service.actualizar(id, cliente);
-        return (actualizado != null) ? ResponseEntity.ok(actualizado) : ResponseEntity.notFound().build();
+        return (actualizado != null)
+                ? ResponseEntity.ok(actualizado)
+                : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/correo/{correo}")

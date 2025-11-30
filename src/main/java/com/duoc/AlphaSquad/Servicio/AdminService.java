@@ -22,6 +22,8 @@ public class AdminService {
     }
 
     public Administrador crear(Administrador admin) {
+        //FORZAR que sea nuevo registro
+        admin.setIdAdministrador(null);
         return repAdmin.save(admin);
     }
 
@@ -31,7 +33,8 @@ public class AdminService {
             existente.setNombre(admin.getNombre());
             existente.setApellido(admin.getApellido());
             existente.setRut(admin.getRut());
-            existente.setEmail(admin.getEmail());
+            existente.setCorreo(admin.getCorreo());
+            existente.setPassword(admin.getPassword());
             return repAdmin.save(existente);
         }
         return null;

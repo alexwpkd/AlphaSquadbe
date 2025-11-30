@@ -2,6 +2,7 @@ package com.duoc.AlphaSquad.Controllador;
 
 import com.duoc.AlphaSquad.Modelo.Administrador;
 import com.duoc.AlphaSquad.Servicio.AdminService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "*")
+// @CrossOrigin("*")
 public class AdminController {
 
     private final AdminService service;
@@ -30,13 +31,13 @@ public class AdminController {
     }
 
     @PostMapping
-    public Administrador crear(@RequestBody Administrador admin) {
+    public Administrador crear(@Valid @RequestBody Administrador admin) {
         return service.crear(admin);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Administrador> actualizar(@PathVariable Long id,
-                                                    @RequestBody Administrador admin) {
+                                                    @Valid @RequestBody Administrador admin) {
         Administrador actualizado = service.actualizar(id, admin);
         return (actualizado != null) ? ResponseEntity.ok(actualizado) : ResponseEntity.notFound().build();
     }

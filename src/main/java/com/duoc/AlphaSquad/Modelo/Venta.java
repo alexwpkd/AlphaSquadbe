@@ -24,6 +24,9 @@ public class Venta {
     private Integer total;
 
     @Column(nullable = false)
+    private Integer descuento;
+
+    @Column(nullable = false)
     private String estado; // pagada, pendiente, anulada
 
     @ManyToOne

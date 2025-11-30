@@ -43,6 +43,13 @@ public class ProductoImagenService {
                 () -> new ResourceNotFoundException("Producto no encontrado: " + id)
         );
     }
+    public List<Producto> buscarPorCategoria(String categoria) {
+        return repo.findByCategoria(categoria);
+    }
+
+    public List<Producto> buscarPorSubcategoria(String subcategoria) {
+        return repo.findBySubcategoria(subcategoria);
+    }
 
     public Producto actualizar(Long id, String nombre, int precio, MultipartFile imagen) {
         Producto p = buscarPorId(id);

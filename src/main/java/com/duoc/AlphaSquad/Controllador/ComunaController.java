@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/comunas")
-@CrossOrigin(origins = "*")
+// @CrossOrigin("*")
 public class ComunaController {
 
     private final ComunaService service;

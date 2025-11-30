@@ -5,7 +5,13 @@ public class InicioSesionSolicitud {
     private String correo;
     private String password;
 
-    public InicioSesionSolicitud() {}
+    public InicioSesionSolicitud() {
+    }
+
+    public InicioSesionSolicitud(String correo, String password) {
+        this.correo = correo;
+        this.password = password;
+    }
 
     public String getCorreo() {
         return correo;

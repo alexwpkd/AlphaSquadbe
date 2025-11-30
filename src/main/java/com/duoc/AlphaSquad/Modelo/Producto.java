@@ -43,6 +43,22 @@ public class Producto {
     @Column(nullable = false)
     private String subcategoria;
 
+    public Producto(Long idProducto, String nombre, String sku, Integer precio,
+                    Boolean enStock, Integer stock, String descripcion,
+                    String categoria, String subcategoria, String imagen) {
+        this.idProducto = idProducto;
+        this.nombre = nombre;
+        this.sku = sku;
+        this.precio = precio;
+        this.enStock = enStock;
+        this.stock = stock;
+        this.descripcion = descripcion;
+        this.categoria = categoria;
+        this.subcategoria = subcategoria;
+        this.imagen = imagen;
+    }
+
+
     @OneToMany(mappedBy = "producto")
     private Set<DetalleVenta> ventas = new HashSet<>();;
 

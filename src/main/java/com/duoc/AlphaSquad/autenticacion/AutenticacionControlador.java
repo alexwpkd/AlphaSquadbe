@@ -6,12 +6,13 @@ import com.duoc.AlphaSquad.Modelo.Empleado;
 import com.duoc.AlphaSquad.Servicio.AdminService;
 import com.duoc.AlphaSquad.Servicio.ClienteService;
 import com.duoc.AlphaSquad.Servicio.EmpleadoService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
+// @CrossOrigin("*")  // No es necesario si ya usas WebConfig global
 public class AutenticacionControlador {
 
     private final AutenticacionServicio authService;
@@ -40,7 +41,7 @@ public class AutenticacionControlador {
     }
 
     @PostMapping("/registro/cliente")
-    public ResponseEntity<?> registroCliente(@RequestBody Cliente cliente) {
+    public ResponseEntity<?> registroCliente(@Valid @RequestBody Cliente cliente) {
 
         if (!ValidacionPassword.esValido(cliente.getPassword()))
             return ResponseEntity.badRequest().body("Password inválida");
@@ -49,7 +50,7 @@ public class AutenticacionControlador {
     }
 
     @PostMapping("/registro/empleado")
-    public ResponseEntity<?> registroEmpleado(@RequestBody Empleado empleado) {
+    public ResponseEntity<?> registroEmpleado(@Valid @RequestBody Empleado empleado) {
 
         if (!ValidacionPassword.esValido(empleado.getPassword()))
             return ResponseEntity.badRequest().body("Password inválida");
@@ -58,7 +59,7 @@ public class AutenticacionControlador {
     }
 
     @PostMapping("/registro/admin")
-    public ResponseEntity<?> registroAdmin(@RequestBody Administrador admin) {
+    public ResponseEntity<?> registroAdmin(@Valid @RequestBody Administrador admin) {
 
         if (!ValidacionPassword.esValido(admin.getPassword()))
             return ResponseEntity.badRequest().body("Password inválida");

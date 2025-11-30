@@ -2,6 +2,7 @@ package com.duoc.AlphaSquad.Controllador;
 
 import com.duoc.AlphaSquad.Modelo.Empleado;
 import com.duoc.AlphaSquad.Servicio.EmpleadoService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/empleados")
-@CrossOrigin(origins = "*")
+// @CrossOrigin("*")
 public class EmpleadoController {
 
     private final EmpleadoService service;
@@ -30,7 +31,7 @@ public class EmpleadoController {
     }
 
     @PostMapping
-    public Empleado crear(@RequestBody Empleado empleado) {
+    public Empleado crear(@Valid @RequestBody Empleado empleado) {
         return service.crear(empleado);
     }
 
@@ -42,14 +43,14 @@ public class EmpleadoController {
     }
 
     @GetMapping("/correo/{correo}")
-    public ResponseEntity<Empleado> porCorreo(@PathVariable String correo) {
+    public ResponseEntity<Empleado> buscarPorCorreo(@PathVariable String correo) {
         return service.buscarPorCorreo(correo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/rut/{rut}")
-    public ResponseEntity<Empleado> porRut(@PathVariable String rut) {
+    public ResponseEntity<Empleado> BuscarporRut(@PathVariable String rut) {
         return service.buscarPorRut(rut)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
