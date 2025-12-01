@@ -1,5 +1,6 @@
 package com.duoc.AlphaSquad.Modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,7 @@ public class DetalleVenta {
 
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
+    @JsonIgnore               // 👈 EVITA ciclos Venta ↔ DetalleVenta
     private Venta venta;
 
     @ManyToOne

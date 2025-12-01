@@ -1,5 +1,6 @@
 package com.duoc.AlphaSquad.Modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +16,7 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include  // Solo el id entra en equals/hashCode
     private Long idProducto;
 
     @Column(nullable = false)
@@ -58,10 +60,15 @@ public class Producto {
         this.imagen = imagen;
     }
 
+    @OneToMany(mappedBy = "producto")
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<DetalleVenta> ventas = new HashSet<>();
 
     @OneToMany(mappedBy = "producto")
-    private Set<DetalleVenta> ventas = new HashSet<>();;
-
-    @OneToMany(mappedBy = "producto")
-    private Set<DetalleCompra> compras = new HashSet<>();;
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<DetalleCompra> compras = new HashSet<>();
 }

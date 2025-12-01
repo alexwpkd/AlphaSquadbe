@@ -1,5 +1,6 @@
 package com.duoc.AlphaSquad.Modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class DetalleCarrito {
 
     @ManyToOne
     @JoinColumn(name = "carrito_id", nullable = false)
+    @JsonIgnore               // 👈 EVITA ciclos Carrito ↔ DetalleCarrito
     private CarritoCompras carrito;
 
     @ManyToOne
