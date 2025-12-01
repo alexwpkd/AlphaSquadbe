@@ -3,11 +3,9 @@ package com.duoc.AlphaSquad.Controllador;
 import com.duoc.AlphaSquad.Modelo.Producto;
 import com.duoc.AlphaSquad.Servicio.ProductoImagenService;
 import com.duoc.AlphaSquad.dto.ProductoCreateDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.*;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.util.List;
@@ -18,11 +16,9 @@ import java.util.List;
 public class ProductoImagenController {
 
     private final ProductoImagenService service;
-    private final ObjectMapper objectMapper;
 
-    public ProductoImagenController(ProductoImagenService service, ObjectMapper objectMapper) {
+    public ProductoImagenController(ProductoImagenService service) {
         this.service = service;
-        this.objectMapper = objectMapper;
     }
 
     @GetMapping
@@ -48,31 +44,23 @@ public class ProductoImagenController {
         return service.buscarPorSubcategoria(subcategoria);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Producto> crear(
-            @RequestParam("dto") String dtoJson,
-            @RequestParam(value = "imagen", required = false) MultipartFile imagen
-    ) throws JsonProcessingException {
+    // ===== Crear / actualizar con JSON normal =====
 
-        ProductoCreateDTO dto = objectMapper.readValue(dtoJson, ProductoCreateDTO.class);
+    @PostMapping
+    public ResponseEntity<Producto> crear(@Valid @RequestBody ProductoCreateDTO dto) {
 
-        Producto creado = service.crearConDTO(dto, imagen);
+        Producto creado = service.crearConDTO(dto);
 
         return ResponseEntity
                 .created(URI.create("/api/productos/" + creado.getIdProducto()))
                 .body(creado);
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Producto> actualizar(
-            @PathVariable Long id,
-            @RequestParam("dto") String dtoJson,
-            @RequestParam(value = "imagen", required = false) MultipartFile imagen
-    ) throws JsonProcessingException {
+    @PutMapping("/{id}")
+    public ResponseEntity<Producto> actualizar(@PathVariable Long id,
+                                               @Valid @RequestBody ProductoCreateDTO dto) {
 
-        ProductoCreateDTO dto = objectMapper.readValue(dtoJson, ProductoCreateDTO.class);
-
-        Producto actualizado = service.actualizarConDTO(id, dto, imagen);
+        Producto actualizado = service.actualizarConDTO(id, dto);
 
         return ResponseEntity.ok(actualizado);
     }

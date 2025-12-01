@@ -27,6 +27,9 @@ public class ProductoCreateDTO {
     @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
 
+    // 👉 NUEVO: URL de la imagen (puede ser opcional, por eso sin @NotBlank)
+    private String imagenUrl;
+
     public ProductoCreateDTO() {}
 
     public String getNombre() {
@@ -83,5 +86,13 @@ public class ProductoCreateDTO {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 }
