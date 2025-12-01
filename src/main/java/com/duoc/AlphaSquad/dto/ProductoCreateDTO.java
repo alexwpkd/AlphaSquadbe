@@ -27,10 +27,12 @@ public class ProductoCreateDTO {
     @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
 
-    // 👉 NUEVO: URL de la imagen (puede ser opcional, por eso sin @NotBlank)
+    // URL que pone el admin (puede ser absoluta o relativa)
+    @NotBlank(message = "La URL de la imagen es obligatoria")
     private String imagenUrl;
 
-    public ProductoCreateDTO() {}
+    public ProductoCreateDTO() {
+    }
 
     public String getNombre() {
         return nombre;

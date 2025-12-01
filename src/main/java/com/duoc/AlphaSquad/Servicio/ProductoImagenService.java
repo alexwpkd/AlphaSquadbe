@@ -53,21 +53,25 @@ public class ProductoImagenService {
 
     public void eliminar(Long id) {
         Producto p = buscarPorId(id);
-        // 👇 Ya no hay archivo físico que borrar, solo eliminamos el registro
         repo.delete(p);
     }
+
+    // ===== Mapeo DTO -> Entidad =====
 
     private void mapearDesdeDTO(ProductoCreateDTO dto, Producto p) {
         p.setNombre(dto.getNombre());
         p.setPrecio(dto.getPrecio());
         p.setSku(dto.getSku());
         p.setStock(dto.getStock());
+
+        // enStock se calcula en base al stock
         p.setEnStock(dto.getStock() != null && dto.getStock() > 0);
+
         p.setCategoria(dto.getCategoria());
         p.setSubcategoria(dto.getSubcategoria());
         p.setDescripcion(dto.getDescripcion());
 
-        // 👇 Aquí guardamos la URL en el campo imagen de Producto
+        // Aquí guardamos la URL que el admin envía
         p.setImagen(dto.getImagenUrl());
     }
 }

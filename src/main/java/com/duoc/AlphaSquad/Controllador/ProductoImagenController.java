@@ -44,13 +44,9 @@ public class ProductoImagenController {
         return service.buscarPorSubcategoria(subcategoria);
     }
 
-    // ===== Crear / actualizar con JSON normal =====
-
     @PostMapping
     public ResponseEntity<Producto> crear(@Valid @RequestBody ProductoCreateDTO dto) {
-
         Producto creado = service.crearConDTO(dto);
-
         return ResponseEntity
                 .created(URI.create("/api/productos/" + creado.getIdProducto()))
                 .body(creado);
@@ -59,9 +55,7 @@ public class ProductoImagenController {
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizar(@PathVariable Long id,
                                                @Valid @RequestBody ProductoCreateDTO dto) {
-
         Producto actualizado = service.actualizarConDTO(id, dto);
-
         return ResponseEntity.ok(actualizado);
     }
 
