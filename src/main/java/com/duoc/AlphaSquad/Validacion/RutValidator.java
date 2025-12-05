@@ -8,11 +8,9 @@ public class RutValidator implements ConstraintValidator<com.duoc.AlphaSquad.Val
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.isBlank()) {
-            // @NotBlank se encargará de validar que no sea null/vacío
             return true;
         }
 
-        // Limpiar puntos y guión
         String rutLimpio = value.replace(".", "").replace("-", "");
         if (rutLimpio.length() < 8 || rutLimpio.length() > 9) {
             return false;
@@ -37,6 +35,6 @@ public class RutValidator implements ConstraintValidator<com.duoc.AlphaSquad.Val
             rut /= 10;
         }
         if (s == 0) return 'K';
-        return (char) (s + 47); // 1-9 -> '1'-'9', 10 -> '0'
+        return (char) (s + 47);
     }
 }

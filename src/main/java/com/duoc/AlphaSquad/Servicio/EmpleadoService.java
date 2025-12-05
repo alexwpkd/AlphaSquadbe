@@ -1,9 +1,10 @@
 package com.duoc.AlphaSquad.Servicio;
 
+import com.duoc.AlphaSquad.Modelo.Administrador;
 import com.duoc.AlphaSquad.Modelo.Empleado;
 import com.duoc.AlphaSquad.Repositorio.RepAdmin;
 import com.duoc.AlphaSquad.Repositorio.RepEmpleado;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.duoc.AlphaSquad.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,11 +13,15 @@ import java.util.Optional;
 @Service
 public class EmpleadoService {
 
-    @Autowired
-    private RepEmpleado repEmpleado;
+    private final RepEmpleado repEmpleado;
+    private final RepAdmin repAdmin;
 
-    @Autowired
-    private RepAdmin repAdmin;
+    public EmpleadoService(RepEmpleado repEmpleado, RepAdmin repAdmin) {
+        this.repEmpleado = repEmpleado;
+        this.repAdmin = repAdmin;
+    }
+
+    // ===== CRUD BÁSICO =====
 
     public List<Empleado> listar() {
         return repEmpleado.findAll();
@@ -28,25 +33,55 @@ public class EmpleadoService {
 
     public Empleado crear(Empleado empleado) {
 
-        repAdmin.findById(empleado.getAdministrador().getIdAdministrador()).orElse(null);
+        // ⚠️ Manejo seguro de ADMINISTRADOR
+        if (empleado.getAdministrador() != null &&
+                empleado.getAdministrador().getIdAdministrador() != null) {
 
+            Long idAdmin = empleado.getAdministrador().getIdAdministrador();
+
+            Administrador admin = repAdmin.findById(idAdmin)
+                    .orElseThrow(() -> new ResourceNotFoundException("Administrador no encontrado: " + idAdmin));
+
+            empleado.setAdministrador(admin);
+        } else {
+            // Si no viene admin o sin id, puedes dejarlo null o lanzar error según tu negocio
+            empleado.setAdministrador(null);
+        }
+
+        // ID de Empleado también es AUTO-INCREMENT
         return repEmpleado.save(empleado);
     }
 
-    public Empleado actualizar(Long id, Empleado empleado) {
-        Empleado existente = buscarPorId(id);
-        if (existente != null) {
+    public Empleado actualizar(Long id, Empleado nuevo) {
+        return repEmpleado.findById(id).map(actual -> {
 
-            existente.setNombre(empleado.getNombre());
-            existente.setApellido(empleado.getApellido());
-            existente.setCorreo(empleado.getCorreo());
-            existente.setRut(empleado.getRut());
-            existente.setPassword(empleado.getPassword());
+            actual.setNombre(nuevo.getNombre());
+            actual.setApellido(nuevo.getApellido());
+            actual.setRut(nuevo.getRut());
+            actual.setCorreo(nuevo.getCorreo());
+            actual.setPassword(nuevo.getPassword());
 
-            return repEmpleado.save(existente);
-        }
-        return null;
+            // ⚠️ Manejo de ADMINISTRADOR en actualización
+            if (nuevo.getAdministrador() != null &&
+                    nuevo.getAdministrador().getIdAdministrador() != null) {
+
+                Long idAdmin = nuevo.getAdministrador().getIdAdministrador();
+                Administrador admin = repAdmin.findById(idAdmin)
+                        .orElseThrow(() -> new ResourceNotFoundException("Administrador no encontrado: " + idAdmin));
+                actual.setAdministrador(admin);
+            } else {
+                actual.setAdministrador(null);
+            }
+
+            return repEmpleado.save(actual);
+        }).orElse(null);
     }
+
+    public void eliminar(Long id) {
+        repEmpleado.deleteById(id);
+    }
+
+    // ===== BÚSQUEDAS ESPECÍFICAS =====
 
     public Optional<Empleado> buscarPorCorreo(String correo) {
         return repEmpleado.findByCorreo(correo);
@@ -54,9 +89,5 @@ public class EmpleadoService {
 
     public Optional<Empleado> buscarPorRut(String rut) {
         return repEmpleado.findByRut(rut);
-    }
-
-    public void eliminar(Long id) {
-        repEmpleado.deleteById(id);
     }
 }

@@ -7,6 +7,7 @@ import com.duoc.AlphaSquad.Servicio.AdminService;
 import com.duoc.AlphaSquad.Servicio.ClienteService;
 import com.duoc.AlphaSquad.Servicio.EmpleadoService;
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,28 +43,73 @@ public class AutenticacionControlador {
 
     @PostMapping("/registro/cliente")
     public ResponseEntity<?> registroCliente(@Valid @RequestBody Cliente cliente) {
+        try {
+            if (!ValidacionPassword.esValido(cliente.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body("Password inválida: debe tener al menos 8 caracteres, una mayúscula y un número.");
+            }
 
-        if (!ValidacionPassword.esValido(cliente.getPassword()))
-            return ResponseEntity.badRequest().body("Password inválida");
+            Cliente creado = clienteService.crear(cliente);
+            return ResponseEntity.ok(creado);
 
-        return ResponseEntity.ok(clienteService.crear(cliente));
+        } catch (DataIntegrityViolationException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error de datos: RUT o correo ya registrados, o comuna inválida.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(500)
+                    .body("Error interno al registrar cliente: " + e.getMessage());
+        }
     }
 
     @PostMapping("/registro/empleado")
     public ResponseEntity<?> registroEmpleado(@Valid @RequestBody Empleado empleado) {
+        try {
+            if (!ValidacionPassword.esValido(empleado.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body("Password inválida: debe tener al menos 8 caracteres, una mayúscula y un número.");
+            }
 
-        if (!ValidacionPassword.esValido(empleado.getPassword()))
-            return ResponseEntity.badRequest().body("Password inválida");
+            Empleado creado = empleadoService.crear(empleado);
+            return ResponseEntity.ok(creado);
 
-        return ResponseEntity.ok(empleadoService.crear(empleado));
+        } catch (DataIntegrityViolationException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error de datos: RUT o correo ya registrados, o administrador inválido.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(500)
+                    .body("Error interno al registrar empleado: " + e.getMessage());
+        }
     }
 
     @PostMapping("/registro/admin")
     public ResponseEntity<?> registroAdmin(@Valid @RequestBody Administrador admin) {
+        try {
+            if (!ValidacionPassword.esValido(admin.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body("Password inválida: debe tener al menos 8 caracteres, una mayúscula y un número.");
+            }
 
-        if (!ValidacionPassword.esValido(admin.getPassword()))
-            return ResponseEntity.badRequest().body("Password inválida");
+            Administrador creado = adminService.crear(admin);
+            return ResponseEntity.ok(creado);
 
-        return ResponseEntity.ok(adminService.crear(admin));
+        } catch (DataIntegrityViolationException e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error de datos: RUT o correo ya registrados.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(500)
+                    .body("Error interno al registrar admin: " + e.getMessage());
+        }
     }
 }

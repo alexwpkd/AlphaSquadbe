@@ -28,19 +28,17 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                // 👑 Rutas solo ADMIN
+                // 🌎 GET públicos para formularios (registro, etc.)
+                .requestMatchers(HttpMethod.GET, "/api/regiones/**", "/api/comunas/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+
+                // 👑 Rutas solo ADMIN (crear/editar/borrar)
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/empleados/**").hasRole("ADMIN")
                 .requestMatchers("/api/compras/**").hasRole("ADMIN")
                 .requestMatchers("/api/detalle-compra/**").hasRole("ADMIN")
                 .requestMatchers("/api/detalle-producto/**").hasRole("ADMIN")
-                .requestMatchers("/api/regiones/**").hasRole("ADMIN")
-
-                // 🛒 Productos:
-                //  - GET abierto (catálogo público)
-                //  - POST/PUT/DELETE solo ADMIN/EMPLEADO
-                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-                .requestMatchers("/api/productos/**").hasAnyRole("ADMIN", "EMPLEADO")
+                .requestMatchers("/api/regiones/**").hasRole("ADMIN") // POST/PUT/DELETE regiones
 
                 // 💵 Ventas, envíos y detalle de venta: ADMIN o EMPLEADO
                 .requestMatchers("/api/ventas/**").hasAnyRole("ADMIN", "EMPLEADO")
@@ -51,7 +49,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/clientes/**").authenticated()
                 .requestMatchers("/api/carritos/**").authenticated()
                 .requestMatchers("/api/detalle-carrito/**").authenticated()
-                .requestMatchers("/api/comunas/**").authenticated()
+                .requestMatchers("/api/comunas/**").authenticated() // POST/PUT/DELETE comunas
 
                 // Cualquier otra request requiere estar autenticado
                 .anyRequest().authenticated()
