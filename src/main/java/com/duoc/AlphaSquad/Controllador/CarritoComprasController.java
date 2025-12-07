@@ -96,8 +96,16 @@ public class CarritoComprasController {
     }
 
     @PostMapping("/{idCliente}/checkout")
-    public ResponseEntity<Venta> checkout(@PathVariable Long idCliente) {
-        Venta venta = service.checkout(idCliente);
-        return ResponseEntity.ok(venta);
+    public ResponseEntity<?> checkout(@PathVariable Long idCliente) {
+        try {
+            Venta venta = service.checkout(idCliente);
+            return ResponseEntity.ok(venta);
+        } catch (IllegalArgumentException e) {
+            // Errores de negocio: carrito vacío, stock insuficiente, cliente/carrito no encontrado, etc.
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error interno en checkout: " + e.getMessage());
+        }
     }
 }

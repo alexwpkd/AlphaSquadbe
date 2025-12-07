@@ -4,6 +4,7 @@ import com.duoc.AlphaSquad.Modelo.*;
 import com.duoc.AlphaSquad.Repositorio.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,7 +44,15 @@ public class CarritoComprasService {
     public CarritoCompras crear(CarritoCompras carrito) {
 
         if (carrito.getCliente() != null) {
+            // solo valida que exista, pero no hace nada si no
             repCliente.findById(carrito.getCliente().getId()).orElse(null);
+        }
+
+        if (carrito.getFechaCreacion() == null) {
+            carrito.setFechaCreacion(LocalDateTime.now());
+        }
+        if (carrito.getEstado() == null) {
+            carrito.setEstado("activo");
         }
 
         return repCarrito.save(carrito);
@@ -75,6 +84,7 @@ public class CarritoComprasService {
      * Obtiene el carrito ACTIVO del cliente.
      * Si no existe, lo crea.
      */
+    @Transactional
     public CarritoCompras obtenerOCrearCarritoActivo(Long idCliente) {
         // Intentamos obtener el carrito del cliente
         CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
@@ -104,6 +114,7 @@ public class CarritoComprasService {
      * Si el carrito no existe, se crea.
      * Si el producto ya está en el carrito, se suma la cantidad.
      */
+    @Transactional
     public DetalleCarrito agregarProductoAlCarrito(Long idCliente, Long idProducto, Integer cantidad) {
         if (cantidad == null || cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
@@ -151,6 +162,7 @@ public class CarritoComprasService {
     /**
      * Actualiza la cantidad de un producto específico dentro del carrito del cliente.
      */
+    @Transactional
     public DetalleCarrito actualizarCantidadProducto(Long idCliente, Long idDetalle, Integer cantidad) {
         if (cantidad == null || cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
@@ -178,6 +190,7 @@ public class CarritoComprasService {
     /**
      * Elimina un ítem específico del carrito del cliente.
      */
+    @Transactional
     public void eliminarItemDelCarrito(Long idCliente, Long idDetalle) {
         CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
         if (carrito == null) {
@@ -195,6 +208,7 @@ public class CarritoComprasService {
     /**
      * Elimina todos los ítems del carrito del cliente.
      */
+    @Transactional
     public void vaciarCarrito(Long idCliente) {
         CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
         if (carrito == null) {
@@ -213,6 +227,7 @@ public class CarritoComprasService {
      *  - Marca carrito como convertido_en_venta
      *  - Vacía el carrito
      */
+    @Transactional
     public Venta checkout(Long idCliente) {
 
         CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
