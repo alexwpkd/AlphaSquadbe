@@ -61,38 +61,72 @@ public class CarritoComprasController {
     // ============ ENDPOINTS DE NEGOCIO ============
 
     @PostMapping("/{idCliente}/agregar")
-    public ResponseEntity<DetalleCarrito> agregarProducto(
+    public ResponseEntity<?> agregarProducto(
             @PathVariable Long idCliente,
             @RequestParam Long productoId,
             @RequestParam Integer cantidad) {
 
-        DetalleCarrito detalle = service.agregarProductoAlCarrito(idCliente, productoId, cantidad);
-        return ResponseEntity.ok(detalle);
+        try {
+            DetalleCarrito detalle = service.agregarProductoAlCarrito(idCliente, productoId, cantidad);
+            return ResponseEntity.ok(detalle);
+        } catch (IllegalArgumentException e) {
+            // Errores de negocio → 400
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Error inesperado → 500 con detalle básico
+            return ResponseEntity.status(500)
+                    .body("Error interno al agregar producto al carrito: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{idCliente}/actualizar/{idDetalle}")
-    public ResponseEntity<DetalleCarrito> actualizarCantidad(
+    public ResponseEntity<?> actualizarCantidad(
             @PathVariable Long idCliente,
             @PathVariable Long idDetalle,
             @RequestParam Integer cantidad) {
 
-        DetalleCarrito actualizado = service.actualizarCantidadProducto(idCliente, idDetalle, cantidad);
-        return ResponseEntity.ok(actualizado);
+        try {
+            DetalleCarrito actualizado = service.actualizarCantidadProducto(idCliente, idDetalle, cantidad);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body("Error interno al actualizar cantidad: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{idCliente}/eliminar-item/{idDetalle}")
-    public ResponseEntity<Void> eliminarItem(
+    public ResponseEntity<?> eliminarItem(
             @PathVariable Long idCliente,
             @PathVariable Long idDetalle) {
 
-        service.eliminarItemDelCarrito(idCliente, idDetalle);
-        return ResponseEntity.noContent().build();
+        try {
+            service.eliminarItemDelCarrito(idCliente, idDetalle);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body("Error interno al eliminar ítem: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{idCliente}/vaciar")
-    public ResponseEntity<Void> vaciarCarrito(@PathVariable Long idCliente) {
-        service.vaciarCarrito(idCliente);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> vaciarCarrito(@PathVariable Long idCliente) {
+        try {
+            service.vaciarCarrito(idCliente);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500)
+                    .body("Error interno al vaciar carrito: " + e.getMessage());
+        }
     }
 
     @PostMapping("/{idCliente}/checkout")
@@ -101,11 +135,12 @@ public class CarritoComprasController {
             Venta venta = service.checkout(idCliente);
             return ResponseEntity.ok(venta);
         } catch (IllegalArgumentException e) {
-            // Errores de negocio: carrito vacío, stock insuficiente, cliente/carrito no encontrado, etc.
+            // ej: carrito vacío, carrito no existe, stock insuficiente, etc.
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error interno en checkout: " + e.getMessage());
+            return ResponseEntity.status(500)
+                    .body("Error interno en checkout: " + e.getMessage());
         }
     }
 }

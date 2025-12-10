@@ -1,7 +1,17 @@
 package com.duoc.AlphaSquad.Servicio;
 
-import com.duoc.AlphaSquad.Modelo.*;
-import com.duoc.AlphaSquad.Repositorio.*;
+import com.duoc.AlphaSquad.Modelo.CarritoCompras;
+import com.duoc.AlphaSquad.Modelo.Cliente;
+import com.duoc.AlphaSquad.Modelo.DetalleCarrito;
+import com.duoc.AlphaSquad.Modelo.DetalleVenta;
+import com.duoc.AlphaSquad.Modelo.Producto;
+import com.duoc.AlphaSquad.Modelo.Venta;
+import com.duoc.AlphaSquad.Repositorio.RepCarritoCompra;
+import com.duoc.AlphaSquad.Repositorio.RepCliente;
+import com.duoc.AlphaSquad.Repositorio.RepDetalleCarrito;
+import com.duoc.AlphaSquad.Repositorio.RepDetalleVenta;
+import com.duoc.AlphaSquad.Repositorio.RepProducto;
+import com.duoc.AlphaSquad.Repositorio.RepVenta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +54,6 @@ public class CarritoComprasService {
     public CarritoCompras crear(CarritoCompras carrito) {
 
         if (carrito.getCliente() != null) {
-            // solo valida que exista, pero no hace nada si no
             repCliente.findById(carrito.getCliente().getId()).orElse(null);
         }
 
@@ -61,17 +70,15 @@ public class CarritoComprasService {
     public CarritoCompras actualizar(Long id, CarritoCompras carrito) {
         CarritoCompras existente = buscarPorId(id);
         if (existente != null) {
-
             existente.setEstado(carrito.getEstado());
             existente.setFechaCreacion(carrito.getFechaCreacion());
-
             return repCarrito.save(existente);
         }
         return null;
     }
 
     public Optional<CarritoCompras> buscarPorCliente(Long idCliente) {
-        return repCarrito.findByClienteId(idCliente);
+        return repCarrito.findByCliente_Id(idCliente);
     }
 
     public void eliminar(Long id) {
@@ -81,41 +88,54 @@ public class CarritoComprasService {
     // ============= LÓGICA DE NEGOCIO =============
 
     /**
-     * Obtiene el carrito ACTIVO del cliente.
-     * Si no existe, lo crea.
+     * Obtiene el carrito del cliente.
+     * - Si NO existe → lo crea.
+     * - Si existe con otro estado → lo pone "activo" y lo reutiliza.
+     * Nunca crea dos carritos para el mismo cliente (por el UNIQUE en cliente_id).
      */
     @Transactional
     public CarritoCompras obtenerOCrearCarritoActivo(Long idCliente) {
-        // Intentamos obtener el carrito del cliente
-        CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
+        System.out.println("[CarritoService] Buscando carrito para cliente id=" + idCliente);
 
-        // Si existe y está activo, lo usamos
-        if (carrito != null && "activo".equalsIgnoreCase(carrito.getEstado())) {
+        CarritoCompras carrito = repCarrito.findByCliente_Id(idCliente).orElse(null);
+
+        if (carrito != null) {
+            System.out.println("[CarritoService] Carrito encontrado (id=" + carrito.getIdCarrito() +
+                    "), estado=" + carrito.getEstado());
+
+            if (!"activo".equalsIgnoreCase(carrito.getEstado())) {
+                carrito.setEstado("activo");
+                carrito = repCarrito.save(carrito);
+                System.out.println("[CarritoService] Estado de carrito actualizado a 'activo'");
+            }
+
             return carrito;
         }
 
-        // Buscamos el cliente
+        // No existe carrito → creamos uno nuevo
         Cliente cliente = repCliente.findById(idCliente).orElse(null);
         if (cliente == null) {
             throw new IllegalArgumentException("Cliente no encontrado con id: " + idCliente);
         }
 
-        // Creamos un nuevo carrito activo
         CarritoCompras nuevo = new CarritoCompras();
         nuevo.setCliente(cliente);
         nuevo.setEstado("activo");
         nuevo.setFechaCreacion(LocalDateTime.now());
 
-        return repCarrito.save(nuevo);
+        CarritoCompras guardado = repCarrito.save(nuevo);
+        System.out.println("[CarritoService] Carrito nuevo creado: idCarrito=" + guardado.getIdCarrito());
+        return guardado;
     }
 
     /**
      * Agrega un producto al carrito del cliente.
-     * Si el carrito no existe, se crea.
-     * Si el producto ya está en el carrito, se suma la cantidad.
      */
     @Transactional
     public DetalleCarrito agregarProductoAlCarrito(Long idCliente, Long idProducto, Integer cantidad) {
+        System.out.println("[CarritoService] agregarProductoAlCarrito -> cliente=" + idCliente +
+                ", producto=" + idProducto + ", cantidad=" + cantidad);
+
         if (cantidad == null || cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
         }
@@ -127,8 +147,12 @@ public class CarritoComprasService {
             throw new IllegalArgumentException("Producto no encontrado con id: " + idProducto);
         }
 
-        // Buscamos si ya existe un detalle de ese producto en el carrito
+        System.out.println("[CarritoService] Producto encontrado: " + producto.getNombre() +
+                " (stock=" + producto.getStock() + ")");
+
         List<DetalleCarrito> detalles = repDetalleCarrito.findByCarrito_IdCarrito(carrito.getIdCarrito());
+        System.out.println("[CarritoService] Detalles actuales en carrito: " + detalles.size());
+
         DetalleCarrito existente = null;
 
         for (DetalleCarrito d : detalles) {
@@ -152,10 +176,16 @@ public class CarritoComprasService {
             nuevo.setCarrito(carrito);
             nuevo.setProducto(producto);
             nuevo.setCantidad(cantidad);
-            return repDetalleCarrito.save(nuevo);
+
+            DetalleCarrito guardado = repDetalleCarrito.save(nuevo);
+            System.out.println("[CarritoService] Detalle nuevo creado: idDetalle=" + guardado.getIdCarritoDetalle());
+            return guardado;
         } else {
             existente.setCantidad(existente.getCantidad() + cantidad);
-            return repDetalleCarrito.save(existente);
+            DetalleCarrito actualizado = repDetalleCarrito.save(existente);
+            System.out.println("[CarritoService] Detalle actualizado: idDetalle=" +
+                    actualizado.getIdCarritoDetalle() + ", nuevaCantidad=" + actualizado.getCantidad());
+            return actualizado;
         }
     }
 
@@ -164,11 +194,14 @@ public class CarritoComprasService {
      */
     @Transactional
     public DetalleCarrito actualizarCantidadProducto(Long idCliente, Long idDetalle, Integer cantidad) {
+        System.out.println("[CarritoService] actualizarCantidadProducto -> cliente=" + idCliente +
+                ", detalle=" + idDetalle + ", cantidad=" + cantidad);
+
         if (cantidad == null || cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
         }
 
-        CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
+        CarritoCompras carrito = repCarrito.findByCliente_Id(idCliente).orElse(null);
         if (carrito == null) {
             throw new IllegalArgumentException("Carrito no encontrado para el cliente id: " + idCliente);
         }
@@ -184,7 +217,10 @@ public class CarritoComprasService {
         }
 
         detalle.setCantidad(cantidad);
-        return repDetalleCarrito.save(detalle);
+        DetalleCarrito actualizado = repDetalleCarrito.save(detalle);
+        System.out.println("[CarritoService] Cantidad actualizada en detalle=" + actualizado.getIdCarritoDetalle() +
+                ", cantidad=" + actualizado.getCantidad());
+        return actualizado;
     }
 
     /**
@@ -192,7 +228,10 @@ public class CarritoComprasService {
      */
     @Transactional
     public void eliminarItemDelCarrito(Long idCliente, Long idDetalle) {
-        CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
+        System.out.println("[CarritoService] eliminarItemDelCarrito -> cliente=" + idCliente +
+                ", detalle=" + idDetalle);
+
+        CarritoCompras carrito = repCarrito.findByCliente_Id(idCliente).orElse(null);
         if (carrito == null) {
             throw new IllegalArgumentException("Carrito no encontrado para el cliente id: " + idCliente);
         }
@@ -203,6 +242,7 @@ public class CarritoComprasService {
         }
 
         repDetalleCarrito.deleteById(idDetalle);
+        System.out.println("[CarritoService] Detalle eliminado correctamente.");
     }
 
     /**
@@ -210,27 +250,26 @@ public class CarritoComprasService {
      */
     @Transactional
     public void vaciarCarrito(Long idCliente) {
-        CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
+        System.out.println("[CarritoService] vaciarCarrito -> cliente=" + idCliente);
+
+        CarritoCompras carrito = repCarrito.findByCliente_Id(idCliente).orElse(null);
         if (carrito == null) {
             throw new IllegalArgumentException("Carrito no encontrado para el cliente id: " + idCliente);
         }
 
         List<DetalleCarrito> detalles = repDetalleCarrito.findByCarrito_IdCarrito(carrito.getIdCarrito());
         repDetalleCarrito.deleteAll(detalles);
+        System.out.println("[CarritoService] Carrito vaciado. Items eliminados: " + detalles.size());
     }
 
     /**
-     * Convierte el carrito del cliente en una venta:
-     *  - Crea Venta
-     *  - Crea DetalleVenta
-     *  - Descuenta stock
-     *  - Marca carrito como convertido_en_venta
-     *  - Vacía el carrito
+     * Convierte el carrito del cliente en una venta.
      */
     @Transactional
     public Venta checkout(Long idCliente) {
+        System.out.println("[CarritoService] checkout -> cliente=" + idCliente);
 
-        CarritoCompras carrito = repCarrito.findByClienteId(idCliente).orElse(null);
+        CarritoCompras carrito = repCarrito.findByCliente_Id(idCliente).orElse(null);
         if (carrito == null) {
             throw new IllegalArgumentException("Carrito no encontrado para el cliente id: " + idCliente);
         }
@@ -255,7 +294,6 @@ public class CarritoComprasService {
         venta.setDescuento(0);
         venta.setTotal(0);
 
-        // Primero guardamos la venta para tener idVenta
         venta = repVenta.save(venta);
 
         int total = 0;
@@ -295,6 +333,9 @@ public class CarritoComprasService {
         carrito.setEstado("convertido_en_venta");
         repCarrito.save(carrito);
         repDetalleCarrito.deleteAll(detallesCarrito);
+
+        System.out.println("[CarritoService] Checkout completado. idVenta=" + venta.getIdVenta() +
+                ", total=" + total);
 
         return venta;
     }

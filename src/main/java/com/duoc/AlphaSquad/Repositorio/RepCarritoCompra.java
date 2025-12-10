@@ -8,5 +8,11 @@ import java.util.Optional;
 
 @Repository
 public interface RepCarritoCompra extends JpaRepository<CarritoCompras, Long> {
-    Optional<CarritoCompras> findByClienteId(Long clienteId);
+
+    /**
+     * Busca el carrito por el ID del cliente.
+     * Usa la propiedad "cliente" de CarritoCompras y la propiedad "id" de Cliente:
+     * path = cliente.id → cliente_Id
+     */
+    Optional<CarritoCompras> findByCliente_Id(Long idCliente);
 }
