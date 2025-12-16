@@ -2,8 +2,18 @@ package com.duoc.AlphaSquad.Servicio;
 
 import com.duoc.AlphaSquad.Modelo.Cliente;
 import com.duoc.AlphaSquad.Modelo.Comuna;
+import com.duoc.AlphaSquad.Modelo.CarritoCompras;
+import com.duoc.AlphaSquad.Modelo.Venta;
+import com.duoc.AlphaSquad.Modelo.Envio;
+import com.duoc.AlphaSquad.Modelo.DetalleCarrito;
+import com.duoc.AlphaSquad.Modelo.DetalleVenta;
 import com.duoc.AlphaSquad.Repositorio.RepCliente;
 import com.duoc.AlphaSquad.Repositorio.RepComuna;
+import com.duoc.AlphaSquad.Repositorio.RepCarritoCompra;
+import com.duoc.AlphaSquad.Repositorio.RepDetalleCarrito;
+import com.duoc.AlphaSquad.Repositorio.RepVenta;
+import com.duoc.AlphaSquad.Repositorio.RepDetalleVenta;
+import com.duoc.AlphaSquad.Repositorio.RepEnvio;
 import com.duoc.AlphaSquad.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +25,26 @@ public class ClienteService {
 
     private final RepCliente repCliente;
     private final RepComuna repComuna;
+    private final RepCarritoCompra repCarrito;
+    private final RepDetalleCarrito repDetalleCarrito;
+    private final RepVenta repVenta;
+    private final RepDetalleVenta repDetalleVenta;
+    private final RepEnvio repEnvio;
 
-    public ClienteService(RepCliente repCliente, RepComuna repComuna) {
+    public ClienteService(RepCliente repCliente,
+                          RepComuna repComuna,
+                          RepCarritoCompra repCarrito,
+                          RepDetalleCarrito repDetalleCarrito,
+                          RepVenta repVenta,
+                          RepDetalleVenta repDetalleVenta,
+                          RepEnvio repEnvio) {
         this.repCliente = repCliente;
         this.repComuna = repComuna;
+        this.repCarrito = repCarrito;
+        this.repDetalleCarrito = repDetalleCarrito;
+        this.repVenta = repVenta;
+        this.repDetalleVenta = repDetalleVenta;
+        this.repEnvio = repEnvio;
     }
 
     // ===== CRUD BÁSICO =====
@@ -42,11 +68,10 @@ public class ClienteService {
 
             cliente.setComuna(comuna);
         } else {
-            // Si no viene comuna o viene sin ID, NO llames a findById(null)
             cliente.setComuna(null);
         }
 
-        // El ID del cliente es AUTO-INCREMENT (no se setea desde el front)
+        // ID auto-increment, no viene desde el front
         return repCliente.save(cliente);
     }
 
@@ -74,8 +99,45 @@ public class ClienteService {
         }).orElse(null);
     }
 
+    /**
+     * Elimina un cliente limpiando primero todas las referencias:
+     *  - carrito_compra + detalle_carrito
+     *  - ventas + detalle_venta + envíos
+     */
     public void eliminar(Long id) {
-        repCliente.deleteById(id);
+
+        Cliente cliente = repCliente.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado: " + id));
+
+        // 1) Carrito + DetalleCarrito
+        repCarrito.findByCliente_Id(id).ifPresent(carrito -> {
+            List<DetalleCarrito> detalles = repDetalleCarrito.findByCarrito_IdCarrito(carrito.getIdCarrito());
+            if (!detalles.isEmpty()) {
+                repDetalleCarrito.deleteAll(detalles);
+            }
+            repCarrito.delete(carrito);
+        });
+
+        // 2) Ventas + DetalleVenta + Envios
+        List<Venta> ventas = repVenta.findByClienteId(id);
+        for (Venta v : ventas) {
+
+            // 2.1) Envío asociado a la venta (si existe)
+            repEnvio.findByVenta_IdVenta(v.getIdVenta())
+                    .ifPresent(repEnvio::delete);
+
+            // 2.2) DetalleVenta asociados
+            List<DetalleVenta> detVentas = repDetalleVenta.findByVenta_IdVenta(v.getIdVenta());
+            if (!detVentas.isEmpty()) {
+                repDetalleVenta.deleteAll(detVentas);
+            }
+
+            // 2.3) Venta
+            repVenta.delete(v);
+        }
+
+        // 3) Finalmente el cliente
+        repCliente.delete(cliente);
     }
 
     // ===== BÚSQUEDAS ESPECÍFICAS =====
