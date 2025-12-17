@@ -85,6 +85,8 @@ public class SecurityConfig {
 
         // Tu frontend (origen) en EC2
         config.setAllowedOrigins(List.of(
+                "http://54.242.202.227",
+                "http://ec2-54-242-202-227.compute-1.amazonaws.com",
                 "http://3.208.15.185",
                 "http://ec2-3-208-15-185.compute-1.amazonaws.com"
         ));
