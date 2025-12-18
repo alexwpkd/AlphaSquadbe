@@ -17,8 +17,6 @@ public class ProductoImagenService {
         this.repo = repo;
     }
 
-    // ===== Consultas básicas =====
-
     public List<Producto> listar() {
         return repo.findAll();
     }
@@ -37,8 +35,6 @@ public class ProductoImagenService {
         return repo.findBySubcategoria(subcategoria);
     }
 
-    // ===== Crear / actualizar usando DTO con URL =====
-
     public Producto crearConDTO(ProductoCreateDTO dto) {
         Producto p = new Producto();
         mapearDesdeDTO(dto, p);
@@ -56,22 +52,18 @@ public class ProductoImagenService {
         repo.delete(p);
     }
 
-    // ===== Mapeo DTO -> Entidad =====
-
     private void mapearDesdeDTO(ProductoCreateDTO dto, Producto p) {
         p.setNombre(dto.getNombre());
         p.setPrecio(dto.getPrecio());
         p.setSku(dto.getSku());
         p.setStock(dto.getStock());
 
-        // enStock se calcula en base al stock
         p.setEnStock(dto.getStock() != null && dto.getStock() > 0);
 
         p.setCategoria(dto.getCategoria());
         p.setSubcategoria(dto.getSubcategoria());
         p.setDescripcion(dto.getDescripcion());
-
-        // Aquí guardamos la URL que el admin envía
+        
         p.setImagen(dto.getImagenUrl());
     }
 }

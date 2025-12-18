@@ -1,5 +1,7 @@
 package com.duoc.AlphaSquad.Modelo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +12,11 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_producto")
     private Long idProducto;
+
+    @JsonProperty("id")
+    public Long getId() {
+        return idProducto;
+    }
 
     @Column(nullable = false, length = 150)
     private String nombre;
@@ -36,17 +43,12 @@ public class Producto {
     @Column(nullable = false, length = 100)
     private String subcategoria;
 
-    // Aquí guardamos la URL o path de la imagen
     @Column(name = "imagen", length = 500)
     private String imagen;
-
-    // ===== Constructores =====
 
     public Producto() {
     }
 
-    // 🔹 Este constructor coincide EXACTO con tu DataInitializer:
-    // new Producto(null, nombre, sku, precio, true, stock, descripcion, categoria, subcategoria, "products/product-img-1")
     public Producto(Long idProducto,
                     String nombre,
                     String sku,
@@ -69,7 +71,6 @@ public class Producto {
         this.imagen = imagen;
     }
 
-    // ===== Getters y Setters =====
 
     public Long getIdProducto() {
         return idProducto;

@@ -64,4 +64,5 @@ public class ProductoImagenController {
         service.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
 }
